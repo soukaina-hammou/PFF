@@ -1,212 +1,121 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ShoppingCart, LogOut, LayoutDashboard, Menu, X, Settings, Tags } from "lucide-react";
+import { Camera, ShoppingCart, User, Settings, LayoutDashboard, LogOut, ChevronDown } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
-import { Button } from "./ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { Badge } from "./ui/badge";
+import CartDrawer from "./CartDrawer";
 
 export default function Navbar() {
   const { user, logout, isAdmin } = useAuth();
-  const { setCartOpen, cartCount } = useCart();
+  const { cartCount, cartOpen, setCartOpen, cartItems, removeFromCart, updateQuantity } = useCart();
   const navigate = useNavigate();
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [userMenuOpen, setUserMenuOpen] = useState(false);
-
-  const initials = user?.name
-    ? user.name
-        .split(" ")
-        .map((n) => n[0])
-        .join("")
-        .toUpperCase()
-        .slice(0, 2)
-    : "U";
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const handleLogout = async () => {
-    setUserMenuOpen(false);
-    setMenuOpen(false);
+    setDropdownOpen(false);
     await logout();
     navigate("/auth", { replace: true });
   };
 
   return (
-    <nav className="sticky top-0 z-40 w-full border-b border-border bg-background/80 backdrop-blur-lg">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center gap-8">
-          <Link to="/" className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground text-sm font-bold">
-              P
-            </div>
-            <span className="text-lg font-semibold text-foreground">PFF</span>
+    <>
+      <header className="fixed top-0 left-0 right-0 z-50 bg-sage/90 backdrop-blur-sm border-b border-dark/10">
+        <div className="container mx-auto px-4 py-3 flex justify-between items-center">
+          <Link to="/" className="flex items-center gap-2 text-dark">
+            <Camera className="w-6 h-6" />
+            <span className="font-bold text-xl">Aura</span>
           </Link>
 
-          <div className="hidden items-center gap-6 md:flex">
-            <Link to="/" className="text-sm text-muted-foreground transition-colors hover:text-foreground">
-              Home
-            </Link>
-            <Link to="/products" className="text-sm text-muted-foreground transition-colors hover:text-foreground">
-              Products
-            </Link>
-            <Link to="/categories" className="text-sm text-muted-foreground transition-colors hover:text-foreground">
-              Categories
-            </Link>
-            <Link to="/about" className="text-sm text-muted-foreground transition-colors hover:text-foreground">
-              About
-            </Link>
-          </div>
-        </div>
+          <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
+            <Link to="/" className="text-dark/70 hover:text-dark transition-colors">HOME</Link>
+            <Link to="/about" className="text-dark/70 hover:text-dark transition-colors">ABOUT</Link>
+            <Link to="/products" className="text-dark/70 hover:text-dark transition-colors">PRODUCT</Link>
+            <Link to="/categories" className="text-dark/70 hover:text-dark transition-colors">CATEGORIES</Link>
+          </nav>
 
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => setCartOpen(true)}
-            className="relative flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-          >
-            <ShoppingCart className="h-5 w-5" />
-            {cartCount > 0 && (
-              <Badge variant="default" className="absolute -top-1 -right-1 h-5 min-w-5 px-1 text-[10px]">
-                {cartCount}
-              </Badge>
-            )}
-          </button>
-
-          {isAdmin && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => navigate("/admin")}
-              className="hidden md:inline-flex items-center gap-1.5"
-            >
-              <LayoutDashboard className="h-4 w-4" />
-              Dashboard
-            </Button>
-          )}
-
-          <div className="relative">
+          <div className="flex items-center gap-3">
             <button
-              onClick={() => setUserMenuOpen(!userMenuOpen)}
-              className="flex items-center gap-2 rounded-lg p-1.5 transition-colors hover:bg-muted"
+              onClick={() => setCartOpen(true)}
+              className="relative flex items-center justify-center w-9 h-9 rounded-lg text-dark/70 hover:text-dark hover:bg-dark/10 transition-colors"
             >
-              <Avatar className="h-8 w-8">
-                {user?.image ? (
-                  <AvatarImage src={user.image} alt={user.name} />
-                ) : null}
-                <AvatarFallback className="bg-primary text-primary-foreground text-xs">
-                  {initials}
-                </AvatarFallback>
-              </Avatar>
-              <span className="hidden text-sm font-medium text-foreground sm:block">
-                {user?.name}
-              </span>
+              <ShoppingCart className="w-5 h-5" />
+              {cartCount > 0 && (
+                <span className="absolute -top-1 -right-1 flex items-center justify-center w-4.5 h-4.5 rounded-full bg-lime text-dark text-[10px] font-bold leading-none">
+                  {cartCount}
+                </span>
+              )}
             </button>
 
-            {userMenuOpen && (
-              <>
-                <div className="fixed inset-0 z-10" onClick={() => setUserMenuOpen(false)} />
-                <div className="absolute right-0 z-20 mt-2 w-56 rounded-xl border border-border bg-popover p-2 shadow-lg">
-                  <div className="border-b border-border px-3 py-2.5">
-                    <p className="text-sm font-medium text-foreground">{user?.name}</p>
-                    <p className="text-xs text-muted-foreground">{user?.email}</p>
-                    <Badge variant="secondary" className="mt-1.5 text-[10px] capitalize">
-                      {user?.role}
-                    </Badge>
-                  </div>
-                  <button
-                    onClick={() => {
-                      setUserMenuOpen(false);
-                      navigate("/categories");
-                    }}
-                    className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-foreground transition-colors hover:bg-muted"
-                  >
-                    <Tags className="h-4 w-4 text-muted-foreground" />
-                    Categories
-                  </button>
-                  {isAdmin && (
-                    <button
-                      onClick={() => {
-                        setUserMenuOpen(false);
-                        navigate("/admin");
-                      }}
-                      className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-foreground transition-colors hover:bg-muted"
-                    >
-                      <LayoutDashboard className="h-4 w-4 text-muted-foreground" />
-                      Dashboard
-                    </button>
+            {user ? (
+              <div className="relative">
+                <button
+                  onClick={() => setDropdownOpen(!dropdownOpen)}
+                  className="flex items-center gap-2 rounded-lg hover:bg-dark/10 transition-colors px-2 py-1.5"
+                >
+                  {user.image ? (
+                    <img src={user.image} alt="" className="w-7 h-7 rounded-full object-cover border border-dark/20" />
+                  ) : (
+                    <div className="w-7 h-7 rounded-full bg-dark/20 flex items-center justify-center">
+                      <User className="w-4 h-4 text-dark" />
+                    </div>
                   )}
-                  <button
-                    onClick={() => {
-                      setUserMenuOpen(false);
-                      navigate("/settings");
-                    }}
-                    className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-foreground transition-colors hover:bg-muted"
-                  >
-                    <Settings className="h-4 w-4 text-muted-foreground" />
-                    Settings
-                  </button>
-                  <button
-                    onClick={handleLogout}
-                    className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-foreground transition-colors hover:bg-muted"
-                  >
-                    <LogOut className="h-4 w-4 text-muted-foreground" />
-                    Logout
-                  </button>
-                </div>
-              </>
-            )}
-          </div>
+                  <span className="text-sm font-medium text-dark hidden sm:block">{user.name}</span>
+                  <ChevronDown className="w-3.5 h-3.5 text-dark/50" />
+                </button>
 
-          <button
-            onClick={() => setMenuOpen(!menuOpen)}
-            className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground md:hidden"
-          >
-            {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </button>
-        </div>
-      </div>
-
-      {menuOpen && (
-        <div className="border-t border-border bg-background md:hidden">
-          <div className="space-y-1 px-4 py-3">
-            <Link
-              to="/"
-              onClick={() => setMenuOpen(false)}
-              className="block rounded-lg px-3 py-2 text-sm text-foreground transition-colors hover:bg-muted"
-            >
-              Home
-            </Link>
-            <Link
-              to="/products"
-              onClick={() => setMenuOpen(false)}
-              className="block rounded-lg px-3 py-2 text-sm text-foreground transition-colors hover:bg-muted"
-            >
-              Products
-            </Link>
-            <Link
-              to="/categories"
-              onClick={() => setMenuOpen(false)}
-              className="block rounded-lg px-3 py-2 text-sm text-foreground transition-colors hover:bg-muted"
-            >
-              Categories
-            </Link>
-            <Link
-              to="/about"
-              onClick={() => setMenuOpen(false)}
-              className="block rounded-lg px-3 py-2 text-sm text-foreground transition-colors hover:bg-muted"
-            >
-              About
-            </Link>
-            {isAdmin && (
+                {dropdownOpen && (
+                  <>
+                    <div className="fixed inset-0 z-40" onClick={() => setDropdownOpen(false)} />
+                    <div className="absolute right-0 top-full mt-2 w-48 rounded-xl border border-dark/10 bg-white shadow-xl z-50 py-2 animate-in fade-in slide-in-from-top-2 duration-200">
+                      <div className="px-4 py-2 border-b border-dark/10 mb-1">
+                        <p className="text-sm font-medium text-dark truncate">{user.name}</p>
+                        <p className="text-xs text-dark/50 truncate">{user.email}</p>
+                      </div>
+                      <Link
+                        to="/settings"
+                        onClick={() => setDropdownOpen(false)}
+                        className="flex items-center gap-2 px-4 py-2 text-sm text-dark/70 hover:text-dark hover:bg-dark/5 transition-colors"
+                      >
+                        <Settings className="w-4 h-4" /> Settings
+                      </Link>
+                      {isAdmin && (
+                        <Link
+                          to="/admin"
+                          onClick={() => setDropdownOpen(false)}
+                          className="flex items-center gap-2 px-4 py-2 text-sm text-dark/70 hover:text-dark hover:bg-dark/5 transition-colors"
+                        >
+                          <LayoutDashboard className="w-4 h-4" /> Dashboard
+                        </Link>
+                      )}
+                      <button
+                        onClick={handleLogout}
+                        className="flex w-full items-center gap-2 px-4 py-2 text-sm text-dark/70 hover:text-dark hover:bg-dark/5 transition-colors"
+                      >
+                        <LogOut className="w-4 h-4" /> Logout
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+            ) : (
               <Link
-                to="/admin"
-                onClick={() => setMenuOpen(false)}
-                className="block rounded-lg px-3 py-2 text-sm text-foreground transition-colors hover:bg-muted"
+                to="/auth"
+                className="bg-lime text-dark font-bold text-sm px-5 py-2 rounded-lg hover:brightness-110 transition-all"
               >
-                Dashboard
+                SIGN IN
               </Link>
             )}
           </div>
         </div>
-      )}
-    </nav>
+      </header>
+
+      <CartDrawer
+        open={cartOpen}
+        onClose={() => setCartOpen(false)}
+        items={cartItems}
+        onRemove={removeFromCart}
+        onUpdateQuantity={updateQuantity}
+      />
+    </>
   );
 }

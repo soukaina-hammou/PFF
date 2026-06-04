@@ -1,58 +1,67 @@
 import { Link } from "react-router-dom";
+import { Camera } from "lucide-react";
 
 export default function Footer() {
   return (
-    <footer className="border-t border-border bg-background">
+    <footer className="border-t border-dark/10 bg-sage/50">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
           <div>
             <div className="flex items-center gap-2">
-              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary text-primary-foreground text-xs font-bold">
-                P
-              </div>
-              <span className="text-sm font-semibold text-foreground">PFF</span>
+              <Camera className="w-5 h-5 text-dark" />
+              <span className="text-sm font-semibold text-dark">Aura</span>
             </div>
-            <p className="mt-3 text-xs text-muted-foreground leading-relaxed">
-              Premium e-commerce platform offering curated products with seamless shopping experience.
+            <p className="mt-3 text-xs text-dark/60 leading-relaxed">
+              A stylish journey toward a verdant tomorrow. Crafted with care and eco-conscious.
             </p>
           </div>
 
           <div>
-            <h4 className="text-sm font-semibold text-foreground mb-3">Quick Links</h4>
+            <h4 className="text-sm font-semibold text-dark mb-3">Quick Links</h4>
             <div className="space-y-2">
-              <Link to="/" className="block text-xs text-muted-foreground transition-colors hover:text-foreground">
+              <Link to="/" className="block text-xs text-dark/60 hover:text-dark transition-colors">
                 Home
               </Link>
-              <Link to="/about" className="block text-xs text-muted-foreground transition-colors hover:text-foreground">
+              <Link to="/about" className="block text-xs text-dark/60 hover:text-dark transition-colors">
                 About
               </Link>
-              <Link to="/auth" className="block text-xs text-muted-foreground transition-colors hover:text-foreground">
-                Sign In
+              <Link to="/products" className="block text-xs text-dark/60 hover:text-dark transition-colors">
+                Products
+              </Link>
+              <Link to="/categories" className="block text-xs text-dark/60 hover:text-dark transition-colors">
+                Categories
               </Link>
             </div>
           </div>
 
           <div>
-            <h4 className="text-sm font-semibold text-foreground mb-3">Support</h4>
+            <h4 className="text-sm font-semibold text-dark mb-3">Support</h4>
             <div className="space-y-2">
-              <p className="text-xs text-muted-foreground">Contact Us</p>
-              <p className="text-xs text-muted-foreground">FAQ</p>
-              <p className="text-xs text-muted-foreground">Shipping Info</p>
+              <p className="text-xs text-dark/60">Contact Us</p>
+              <p className="text-xs text-dark/60">FAQ</p>
+              <p className="text-xs text-dark/60">Shipping Info</p>
             </div>
           </div>
 
           <div>
-            <h4 className="text-sm font-semibold text-foreground mb-3">Legal</h4>
+            <h4 className="text-sm font-semibold text-dark mb-3">Account</h4>
             <div className="space-y-2">
-              <p className="text-xs text-muted-foreground">Privacy Policy</p>
-              <p className="text-xs text-muted-foreground">Terms of Service</p>
+              <Link to="/auth" className="block text-xs text-dark/60 hover:text-dark transition-colors">
+                Sign In
+              </Link>
+              <Link to="/settings" className="block text-xs text-dark/60 hover:text-dark transition-colors">
+                Settings
+              </Link>
+              <Link to="/checkout" className="block text-xs text-dark/60 hover:text-dark transition-colors">
+                Checkout
+              </Link>
             </div>
           </div>
         </div>
 
-        <div className="mt-10 border-t border-border pt-6 text-center">
-          <p className="text-xs text-muted-foreground">
-            &copy; {new Date().getFullYear()} PFF. All rights reserved.
+        <div className="mt-10 border-t border-dark/10 pt-6 text-center">
+          <p className="text-xs text-dark/50">
+            &copy; {new Date().getFullYear()} Aura. All rights reserved.
           </p>
         </div>
       </div>
