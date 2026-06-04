@@ -13,6 +13,7 @@ import DashboardPage from "./pages/admin/DashboardPage";
 import UsersPage from "./pages/admin/UsersPage";
 import AdminProductsPage from "./pages/admin/ProductsPage";
 import AdminCategoriesPage from "./pages/admin/CategoriesPage";
+import HeroSlidesPage from "./pages/admin/HeroSlidesPage";
 
 export default function App() {
   const { user, loading } = useAuth();
@@ -74,6 +75,10 @@ export default function App() {
       <Route
         path="/admin/categories"
         element={<AdminRoute><AdminCategoriesPage /></AdminRoute>}
+      />
+      <Route
+        path="/admin/hero"
+        element={<AdminRoute><HeroSlidesPage /></AdminRoute>}
       />
       <Route path="*" element={<Navigate to={user ? "/" : "/auth"} replace />} />
     </Routes>

@@ -1,6 +1,7 @@
 const User = require("../models/User");
 const Product = require("../models/Product");
 const Category = require("../models/Category");
+const HeroSlide = require("../models/HeroSlide");
 
 const bcrypt = require("bcryptjs");
 
@@ -176,6 +177,49 @@ const deleteCategory = async (req, res) => {
   }
 };
 
+const getHeroSlides = async (req, res) => {
+  try {
+    const slides = await HeroSlide.find({}).sort({ order: 1, createdAt: -1 });
+    return res.json({ slides });
+  } catch {
+    return res.status(500).json({ message: "Server error" });
+  }
+};
+
+const createHeroSlide = async (req, res) => {
+  try {
+    const { image, title, subtitle, active, order } = req.body;
+    if (!image) return res.status(400).json({ message: "Image is required" });
+    const slide = await HeroSlide.create({ image, title, subtitle, active, order });
+    return res.status(201).json({ message: "Hero slide created", slide });
+  } catch {
+    return res.status(500).json({ message: "Server error" });
+  }
+};
+
+const updateHeroSlide = async (req, res) => {
+  try {
+    const slide = await HeroSlide.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true,
+    });
+    if (!slide) return res.status(404).json({ message: "Hero slide not found" });
+    return res.json({ message: "Hero slide updated", slide });
+  } catch {
+    return res.status(500).json({ message: "Server error" });
+  }
+};
+
+const deleteHeroSlide = async (req, res) => {
+  try {
+    const slide = await HeroSlide.findByIdAndDelete(req.params.id);
+    if (!slide) return res.status(404).json({ message: "Hero slide not found" });
+    return res.json({ message: "Hero slide deleted" });
+  } catch {
+    return res.status(500).json({ message: "Server error" });
+  }
+};
+
 module.exports = {
   getUsers,
   createUser,
@@ -189,4 +233,8 @@ module.exports = {
   createCategory,
   updateCategory,
   deleteCategory,
+  getHeroSlides,
+  createHeroSlide,
+  updateHeroSlide,
+  deleteHeroSlide,
 };

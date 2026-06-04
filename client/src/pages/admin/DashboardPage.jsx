@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Users, Package, TrendingUp, DollarSign, Tags } from "lucide-react";
+import { Users, Package, TrendingUp, DollarSign, Tags, Image as ImageIcon } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { getUsers, getAdminProducts, getCategories } from "../../api/admin";
 import Layout from "../../components/Layout";
@@ -87,7 +87,7 @@ export default function DashboardPage() {
           </Card>
         </div>
 
-        <div className="mt-8 grid gap-6 sm:grid-cols-3">
+        <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           <Card className="border-border bg-card">
             <CardHeader>
               <CardTitle className="text-foreground">Manage Users</CardTitle>
@@ -113,6 +113,15 @@ export default function DashboardPage() {
             <CardContent>
               <p className="text-sm text-muted-foreground mb-4">Create and manage product categories.</p>
               <Button onClick={() => navigate("/admin/categories")}>Go to Categories</Button>
+            </CardContent>
+          </Card>
+          <Card className="border-border bg-card">
+            <CardHeader>
+              <CardTitle className="text-foreground">Hero Slides</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground mb-4">Manage homepage hero images and banners.</p>
+              <Button onClick={() => navigate("/admin/hero")}>Go to Hero</Button>
             </CardContent>
           </Card>
         </div>

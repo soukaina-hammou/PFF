@@ -43,6 +43,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/products", require("./routes/productRoutes"));
 app.use("/api/categories", require("./routes/categoryRoutes"));
 app.use("/api/admin", require("./routes/adminRoutes"));
+app.use("/api/hero", require("./routes/heroRoutes"));
 
 const startServer = async () => {
   try {

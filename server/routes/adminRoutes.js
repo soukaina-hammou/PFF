@@ -12,6 +12,10 @@ const {
   createCategory,
   updateCategory,
   deleteCategory,
+  getHeroSlides,
+  createHeroSlide,
+  updateHeroSlide,
+  deleteHeroSlide,
 } = require("../controllers/adminController");
 const authMiddleware = require("../middleware/authMiddleware");
 const adminMiddleware = require("../middleware/adminMiddleware");
@@ -34,5 +38,10 @@ router.get("/categories", getCategories);
 router.post("/categories", createCategory);
 router.put("/categories/:id", updateCategory);
 router.delete("/categories/:id", deleteCategory);
+
+router.get("/hero", getHeroSlides);
+router.post("/hero", createHeroSlide);
+router.put("/hero/:id", updateHeroSlide);
+router.delete("/hero/:id", deleteHeroSlide);
 
 module.exports = router;
