@@ -1,169 +1,149 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import AuthForm from "../../components/auth/AuthForm";
-import AuthIllustration from "../../components/auth/AuthIllustration";
-import { getCurrentUser, logout, signin, signup } from "../../api/auth";
-
-const TOKEN_KEY = "auth_token";
+import { useAuth } from "../../context/AuthContext";
+import { Button } from "../../components/ui/button";
+import { Input } from "../../components/ui/input";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../components/ui/card";
 
 export default function AuthPage() {
   const navigate = useNavigate();
+  const { user, loading, signin, signup } = useAuth();
   const [mode, setMode] = useState("signin");
-  const [token, setToken] = useState(localStorage.getItem(TOKEN_KEY) || "");
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [status, setStatus] = useState("Ready");
+  const [formData, setFormData] = useState({ name: "", email: "", password: "" });
   const [error, setError] = useState("");
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    password: "",
-  });
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    if (!token) {
-      return;
+    if (!loading && user) {
+      navigate("/", { replace: true });
     }
+  }, [user, loading, navigate]);
 
-    const loadCurrentUser = async () => {
-      try {
-        const data = await getCurrentUser(token);
-        setUser(data.user);
-        navigate("/home", { replace: true });
-      } catch (err) {
-        localStorage.removeItem(TOKEN_KEY);
-        setToken("");
-        setUser(null);
-        setError(err.message || "Session expired");
-      }
-    };
-
-    loadCurrentUser();
-  }, [navigate, token]);
-
-  const greeting = useMemo(() => {
-    if (!user) {
-      return null;
-    }
-
-    return {
-      title: `Hello, ${user.name}`,
-      subtitle: "Your account is active and ready.",
-    };
-  }, [user]);
-
-  const onInputChange = (event) => {
-    const { name, value } = event.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+  const handleChange = (e) => {
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const onSubmit = async (event) => {
-    event.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     setError("");
-    setStatus("Processing...");
-    setLoading(true);
-
+    setSubmitting(true);
     try {
-      const payload = {
-        email: formData.email,
-        password: formData.password,
-      };
-
-      const data =
-        mode === "signup"
-          ? await signup({ ...payload, name: formData.name })
-          : await signin(payload);
-
-      localStorage.setItem(TOKEN_KEY, data.token);
-      setToken(data.token);
-      setUser(data.user);
-      setStatus(data.message);
-      setFormData({ name: "", email: "", password: "" });
-      navigate("/home", { replace: true });
+      if (mode === "signup") {
+        await signup(formData);
+      } else {
+        await signin({ email: formData.email, password: formData.password });
+      }
+      navigate("/", { replace: true });
     } catch (err) {
       setError(err.message || "Authentication failed");
-      setStatus("Ready");
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
   };
 
-  const onLogout = async () => {
-    setError("");
-    setLoading(true);
-
-    try {
-      const data = await logout();
-      setStatus(data.message || "Logged out");
-    } catch {
-      setStatus("Logged out");
-    } finally {
-      localStorage.removeItem(TOKEN_KEY);
-      setToken("");
-      setUser(null);
-      setLoading(false);
-    }
-  };
-
-  if (user) {
+  if (loading) {
     return (
-      <main className="min-h-screen bg-linear-to-br from-slate-100 via-white to-indigo-100 p-4 sm:p-6">
-        <section className="mx-auto grid min-h-[calc(100vh-2rem)] max-w-6xl items-center gap-6 rounded-4xl border border-white/70 bg-white/80 p-4 shadow-[0_30px_90px_rgba(15,23,42,0.08)] backdrop-blur-sm sm:min-h-[calc(100vh-3rem)] sm:grid-cols-[1.1fr_0.9fr] sm:p-6">
-          <AuthIllustration />
-
-          <div className="rounded-4xl bg-white p-6 shadow-[0_30px_90px_rgba(15,23,42,0.12)] sm:p-8">
-            <div className="inline-flex rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-600">
-              Authenticated
-            </div>
-            <h1 className="mt-5 text-3xl font-semibold tracking-tight text-slate-900">
-              {greeting.title}
-            </h1>
-            <p className="mt-2 text-sm text-slate-500">{greeting.subtitle}</p>
-
-            <div className="mt-8 rounded-3xl border border-slate-100 bg-slate-50 p-5">
-              <p className="text-sm font-medium text-slate-700">Current user</p>
-              <div className="mt-4 space-y-2 text-sm text-slate-600">
-                <p>
-                  <span className="font-medium text-slate-900">Name:</span>{" "}
-                  {user.name}
-                </p>
-                <p>
-                  <span className="font-medium text-slate-900">Email:</span>{" "}
-                  {user.email}
-                </p>
-              </div>
-            </div>
-
-            <button
-              type="button"
-              onClick={onLogout}
-              disabled={loading}
-              className="mt-6 w-full rounded-2xl bg-slate-900 px-4 py-3.5 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-70"
-            >
-              {loading ? "Logging out..." : "Logout"}
-            </button>
-          </div>
-        </section>
-      </main>
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-border border-t-primary" />
+      </div>
     );
   }
 
   return (
-    <main className="min-h-screen bg-linear-to-br from-slate-100 via-white to-indigo-100 p-4 sm:p-6">
-      <section className="mx-auto grid min-h-[calc(100vh-2rem)] max-w-6xl gap-6 rounded-4xl border border-white/70 bg-white/80 p-4 shadow-[0_30px_90px_rgba(15,23,42,0.08)] backdrop-blur-sm sm:min-h-[calc(100vh-3rem)] sm:grid-cols-[1.1fr_0.9fr] sm:p-6">
-        <AuthIllustration />
+    <div className="flex min-h-screen items-center justify-center bg-background p-4">
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(75,86,148,0.12),transparent_50%),radial-gradient(ellipse_at_bottom_left,rgba(114,136,174,0.08),transparent_50%)]" />
+      <Card className="relative w-full max-w-md border-border bg-card shadow-xl">
+        <CardHeader className="text-center">
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary">
+            <span className="text-xl font-bold text-primary-foreground">P</span>
+          </div>
+          <CardTitle className="text-foreground text-xl">
+            {mode === "signin" ? "Welcome Back" : "Create Account"}
+          </CardTitle>
+          <CardDescription>
+            {mode === "signin"
+              ? "Sign in to your account to continue"
+              : "Create an account to get started"}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {mode === "signup" && (
+              <div>
+                <label className="text-sm font-medium text-foreground mb-1 block">Name</label>
+                <Input
+                  name="name"
+                  placeholder="Your name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+            )}
+            <div>
+              <label className="text-sm font-medium text-foreground mb-1 block">Email</label>
+              <Input
+                name="email"
+                type="email"
+                placeholder="you@example.com"
+                value={formData.email}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-foreground mb-1 block">Password</label>
+              <Input
+                name="password"
+                type="password"
+                placeholder="Min. 6 characters"
+                value={formData.password}
+                onChange={handleChange}
+                required
+                minLength={6}
+              />
+            </div>
 
-        <AuthForm
-          mode={mode}
-          formData={formData}
-          onInputChange={onInputChange}
-          onSubmit={onSubmit}
-          onModeChange={setMode}
-          loading={loading}
-          error={error}
-          status={status}
-        />
-      </section>
-    </main>
+            {error && (
+              <div className="rounded-lg bg-destructive/10 px-3 py-2 text-sm text-destructive">
+                {error}
+              </div>
+            )}
+
+            <Button type="submit" className="w-full" disabled={submitting}>
+              {submitting
+                ? "Processing..."
+                : mode === "signin"
+                  ? "Sign In"
+                  : "Sign Up"}
+            </Button>
+          </form>
+
+          <div className="mt-6 text-center text-sm text-muted-foreground">
+            {mode === "signin" ? (
+              <>
+                Don't have an account?{" "}
+                <button
+                  onClick={() => { setMode("signup"); setError(""); }}
+                  className="font-medium text-primary hover:underline"
+                >
+                  Sign Up
+                </button>
+              </>
+            ) : (
+              <>
+                Already have an account?{" "}
+                <button
+                  onClick={() => { setMode("signin"); setError(""); }}
+                  className="font-medium text-primary hover:underline"
+                >
+                  Sign In
+                </button>
+              </>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   );
 }
