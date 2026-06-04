@@ -1,26 +1,19 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ShoppingBag, Star, TrendingUp, ArrowRight } from "lucide-react";
+import { ShoppingBag, Star, TrendingUp, ArrowRight, ShoppingCart } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
+import { useCart } from "../../context/CartContext";
 import { getProducts } from "../../api/products";
 import Layout from "../../components/Layout";
 import { Button } from "../../components/ui/button";
 import { Card, CardContent } from "../../components/ui/card";
 import { Badge } from "../../components/ui/badge";
 
-const featuredProducts = [
-  { name: "Wireless Headphones", price: 129.99, rating: 4.8, category: "Electronics", image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=300&q=80" },
-  { name: "Minimal Watch", price: 249.99, rating: 4.6, category: "Accessories", image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=300&q=80" },
-  { name: "Leather Backpack", price: 89.99, rating: 4.7, category: "Fashion", image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=300&q=80" },
-  { name: "Smart Speaker", price: 199.99, rating: 4.5, category: "Electronics", image: "https://images.unsplash.com/photo-1589003077984-894e133dabab?w=300&q=80" },
-  { name: "Sunglasses", price: 159.99, rating: 4.4, category: "Accessories", image: "https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=300&q=80" },
-  { name: "Canvas Sneakers", price: 74.99, rating: 4.9, category: "Fashion", image: "https://images.unsplash.com/photo-1549298916-b41d501d3772?w=300&q=80" },
-];
-
 export default function HomePage() {
   const { user, loading } = useAuth();
+  const { addToCart, setCartOpen } = useCart();
   const navigate = useNavigate();
-  const [products, setProducts] = useState(featuredProducts);
+  const [products, setProducts] = useState([]);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -29,7 +22,7 @@ export default function HomePage() {
   }, [user, loading, navigate]);
 
   useEffect(() => {
-    getProducts()
+    getProducts({ page: 1, limit: 6 })
       .then((data) => {
         if (data.products && data.products.length > 0) {
           setProducts(data.products);
@@ -37,6 +30,12 @@ export default function HomePage() {
       })
       .catch(() => {});
   }, []);
+
+  const handleAddToCart = (product, e) => {
+    e.preventDefault();
+    addToCart(product);
+    setCartOpen(true);
+  };
 
   if (loading || !user) {
     return (
@@ -64,11 +63,11 @@ export default function HomePage() {
               Curated selection of premium products. Quality meets design in every item we offer.
             </p>
             <div className="mt-8 flex items-center justify-center gap-4">
-              <Button size="lg" className="gap-2">
-                Shop Now
+              <Button size="lg" className="gap-2" onClick={() => navigate("/products")}>
                 <ShoppingBag className="h-4 w-4" />
+                Shop Now
               </Button>
-              <Button variant="outline" size="lg">
+              <Button variant="outline" size="lg" onClick={() => navigate("/about")}>
                 Learn More
               </Button>
             </div>
@@ -97,36 +96,49 @@ export default function HomePage() {
               <h2 className="text-2xl font-bold text-foreground sm:text-3xl">Featured Products</h2>
               <p className="mt-1 text-sm text-muted-foreground">Handpicked just for you</p>
             </div>
-            <Button variant="ghost" size="sm" className="gap-1">
+            <Button variant="ghost" size="sm" className="gap-1" onClick={() => navigate("/products")}>
               View All <ArrowRight className="h-4 w-4" />
             </Button>
           </div>
 
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {products.map((product, idx) => (
-              <Card key={idx} className="group overflow-hidden border-border bg-card transition-all hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5">
+            {products.map((product) => (
+              <Card
+                key={product._id}
+                className="group overflow-hidden border-border bg-card transition-all hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5 cursor-pointer"
+                onClick={() => navigate(`/products/${product._id}`)}
+              >
                 <div className="relative aspect-[4/3] overflow-hidden bg-muted">
-                  <img
-                    src={product.image}
-                    alt={product.name}
-                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    onError={(e) => {
-                      e.target.style.display = "none";
-                    }}
-                  />
+                  {product.image ? (
+                    <img
+                      src={product.image}
+                      alt={product.name}
+                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center text-muted-foreground" />
+                  )}
                   <Badge variant="secondary" className="absolute left-3 top-3">
                     {product.category}
                   </Badge>
                 </div>
                 <CardContent className="p-5">
-                  <div className="flex items-center gap-1 mb-1">
-                    <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
-                    <span className="text-xs font-medium text-muted-foreground">{product.rating}</span>
-                  </div>
                   <h3 className="text-base font-semibold text-foreground">{product.name}</h3>
+                  <p className="mt-1 text-xs text-muted-foreground line-clamp-2">
+                    {product.description}
+                  </p>
                   <div className="mt-3 flex items-center justify-between">
-                    <span className="text-lg font-bold text-primary">${product.price.toFixed(2)}</span>
-                    <Button size="sm">Add to Cart</Button>
+                    <span className="text-lg font-bold text-primary">
+                      ${product.price.toFixed(2)}
+                    </span>
+                    <Button
+                      size="sm"
+                      className="gap-1"
+                      onClick={(e) => handleAddToCart(product, e)}
+                    >
+                      <ShoppingCart className="h-3.5 w-3.5" />
+                      Add to Cart
+                    </Button>
                   </div>
                 </CardContent>
               </Card>

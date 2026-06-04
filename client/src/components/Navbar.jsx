@@ -1,13 +1,15 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ShoppingCart, User, LogOut, LayoutDashboard, Menu, X } from "lucide-react";
+import { ShoppingCart, LogOut, LayoutDashboard, Menu, X, Package } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
+import { useCart } from "../context/CartContext";
 import { Button } from "./ui/button";
-import { Avatar, AvatarFallback } from "./ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Badge } from "./ui/badge";
 
-export default function Navbar({ onCartClick, cartCount = 0 }) {
+export default function Navbar() {
   const { user, logout, isAdmin } = useAuth();
+  const { setCartOpen, cartCount } = useCart();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
@@ -22,8 +24,10 @@ export default function Navbar({ onCartClick, cartCount = 0 }) {
     : "U";
 
   const handleLogout = async () => {
+    setUserMenuOpen(false);
+    setMenuOpen(false);
     await logout();
-    navigate("/auth");
+    navigate("/auth", { replace: true });
   };
 
   return (
@@ -41,6 +45,9 @@ export default function Navbar({ onCartClick, cartCount = 0 }) {
             <Link to="/" className="text-sm text-muted-foreground transition-colors hover:text-foreground">
               Home
             </Link>
+            <Link to="/products" className="text-sm text-muted-foreground transition-colors hover:text-foreground">
+              Products
+            </Link>
             <Link to="/about" className="text-sm text-muted-foreground transition-colors hover:text-foreground">
               About
             </Link>
@@ -49,7 +56,7 @@ export default function Navbar({ onCartClick, cartCount = 0 }) {
 
         <div className="flex items-center gap-3">
           <button
-            onClick={onCartClick}
+            onClick={() => setCartOpen(true)}
             className="relative flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
           >
             <ShoppingCart className="h-5 w-5" />
@@ -78,6 +85,9 @@ export default function Navbar({ onCartClick, cartCount = 0 }) {
               className="flex items-center gap-2 rounded-lg p-1.5 transition-colors hover:bg-muted"
             >
               <Avatar className="h-8 w-8">
+                {user?.image ? (
+                  <AvatarImage src={user.image} alt={user.name} />
+                ) : null}
                 <AvatarFallback className="bg-primary text-primary-foreground text-xs">
                   {initials}
                 </AvatarFallback>
@@ -140,6 +150,13 @@ export default function Navbar({ onCartClick, cartCount = 0 }) {
               className="block rounded-lg px-3 py-2 text-sm text-foreground transition-colors hover:bg-muted"
             >
               Home
+            </Link>
+            <Link
+              to="/products"
+              onClick={() => setMenuOpen(false)}
+              className="block rounded-lg px-3 py-2 text-sm text-foreground transition-colors hover:bg-muted"
+            >
+              Products
             </Link>
             <Link
               to="/about"

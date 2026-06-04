@@ -36,6 +36,7 @@ const signup = async (req, res) => {
       name: name.trim(),
       email: normalizedEmail,
       password: hashedPassword,
+      image: req.body.image || "",
     });
 
     const token = buildToken(user._id);
@@ -48,6 +49,7 @@ const signup = async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        image: user.image,
       },
     });
   } catch {
@@ -87,6 +89,7 @@ const signin = async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        image: user.image,
       },
     });
   } catch {

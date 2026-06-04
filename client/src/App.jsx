@@ -4,9 +4,11 @@ import { ProtectedRoute, AdminRoute } from "./components/ProtectedRoute";
 import AuthPage from "./pages/auth/AuthPage";
 import HomePage from "./pages/home/HomePage";
 import AboutPage from "./pages/about/AboutPage";
+import ProductsPage from "./pages/products/ProductsPage";
+import ProductDetailPage from "./pages/products/ProductDetailPage";
 import DashboardPage from "./pages/admin/DashboardPage";
 import UsersPage from "./pages/admin/UsersPage";
-import ProductsPage from "./pages/admin/ProductsPage";
+import AdminProductsPage from "./pages/admin/ProductsPage";
 
 export default function App() {
   const { user, loading } = useAuth();
@@ -30,6 +32,14 @@ export default function App() {
         element={user ? <Navigate to="/" replace /> : <AuthPage />}
       />
       <Route
+        path="/products"
+        element={<ProtectedRoute><ProductsPage /></ProtectedRoute>}
+      />
+      <Route
+        path="/products/:id"
+        element={<ProtectedRoute><ProductDetailPage /></ProtectedRoute>}
+      />
+      <Route
         path="/about"
         element={<ProtectedRoute><AboutPage /></ProtectedRoute>}
       />
@@ -43,7 +53,7 @@ export default function App() {
       />
       <Route
         path="/admin/products"
-        element={<AdminRoute><ProductsPage /></AdminRoute>}
+        element={<AdminRoute><AdminProductsPage /></AdminRoute>}
       />
       <Route path="*" element={<Navigate to={user ? "/" : "/auth"} replace />} />
     </Routes>
