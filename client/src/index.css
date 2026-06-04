@@ -14,8 +14,8 @@ body,
 body {
   margin: 0;
   font-family: "Geist Variable", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  background: #111844;
-  color: #EAE0CF;
+  background: #4A4466;
+  color: #F1F7D4;
 }
 
 @theme inline {
@@ -62,38 +62,38 @@ body {
 }
 
 :root {
-  --background: #111844;
-  --foreground: #EAE0CF;
-  --card: #1a1f4a;
-  --card-foreground: #EAE0CF;
-  --popover: #1a1f4a;
-  --popover-foreground: #EAE0CF;
-  --primary: #4B5694;
-  --primary-foreground: #EAE0CF;
-  --secondary: #7288AE;
-  --secondary-foreground: #111844;
-  --muted: #2a3060;
-  --muted-foreground: #9aa8be;
-  --accent: #4B5694;
-  --accent-foreground: #EAE0CF;
+  --background: #4A4466;
+  --foreground: #F1F7D4;
+  --card: #534d72;
+  --card-foreground: #F1F7D4;
+  --popover: #534d72;
+  --popover-foreground: #F1F7D4;
+  --primary: #6EADBC;
+  --primary-foreground: #4A4466;
+  --secondary: #9FCBAD;
+  --secondary-foreground: #4A4466;
+  --muted: #5d5779;
+  --muted-foreground: #c5cdb0;
+  --accent: #9FCBAD;
+  --accent-foreground: #4A4466;
   --destructive: oklch(0.577 0.245 27.325);
-  --border: #2a3060;
-  --input: #2a3060;
-  --ring: #4B5694;
-  --chart-1: #4B5694;
-  --chart-2: #7288AE;
-  --chart-3: #EAE0CF;
-  --chart-4: #2a3060;
-  --chart-5: #1a1f4a;
+  --border: #5d5779;
+  --input: #5d5779;
+  --ring: #6EADBC;
+  --chart-1: #6EADBC;
+  --chart-2: #9FCBAD;
+  --chart-3: #F1F7D4;
+  --chart-4: #5d5779;
+  --chart-5: #534d72;
   --radius: 0.625rem;
-  --sidebar: #0d1233;
-  --sidebar-foreground: #EAE0CF;
-  --sidebar-primary: #4B5694;
-  --sidebar-primary-foreground: #EAE0CF;
-  --sidebar-accent: #2a3060;
-  --sidebar-accent-foreground: #EAE0CF;
-  --sidebar-border: #2a3060;
-  --sidebar-ring: #4B5694;
+  --sidebar: #3e385c;
+  --sidebar-foreground: #F1F7D4;
+  --sidebar-primary: #6EADBC;
+  --sidebar-primary-foreground: #4A4466;
+  --sidebar-accent: #5d5779;
+  --sidebar-accent-foreground: #F1F7D4;
+  --sidebar-border: #5d5779;
+  --sidebar-ring: #6EADBC;
 }
 
 @layer base {

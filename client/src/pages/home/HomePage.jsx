@@ -109,9 +109,9 @@ export default function HomePage() {
                 onClick={() => navigate(`/products/${product._id}`)}
               >
                 <div className="relative aspect-[4/3] overflow-hidden bg-muted">
-                  {product.image ? (
+                  {product.images?.[0] || product.image ? (
                     <img
-                      src={product.image}
+                      src={product.images?.[0] || product.image}
                       alt={product.name}
                       className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                     />

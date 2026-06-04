@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Users, Package, TrendingUp, DollarSign } from "lucide-react";
+import { Users, Package, TrendingUp, DollarSign, Tags } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
-import { getUsers } from "../../api/admin";
-import { getAdminProducts } from "../../api/admin";
+import { getUsers, getAdminProducts, getCategories } from "../../api/admin";
 import Layout from "../../components/Layout";
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
 import { Button } from "../../components/ui/button";
@@ -11,7 +10,7 @@ import { Button } from "../../components/ui/button";
 export default function DashboardPage() {
   const { user, isAdmin, loading } = useAuth();
   const navigate = useNavigate();
-  const [stats, setStats] = useState({ users: 0, products: 0 });
+  const [stats, setStats] = useState({ users: 0, products: 0, categories: 0 });
 
   useEffect(() => {
     if (!loading && (!user || !isAdmin)) {
@@ -23,10 +22,12 @@ export default function DashboardPage() {
     Promise.all([
       getUsers().catch(() => ({ users: [] })),
       getAdminProducts().catch(() => ({ products: [] })),
-    ]).then(([usersData, productsData]) => {
+      getCategories().catch(() => ({ categories: [] })),
+    ]).then(([usersData, productsData, categoriesData]) => {
       setStats({
         users: usersData.users?.length || 0,
         products: productsData.products?.length || 0,
+        categories: categoriesData.categories?.length || 0,
       });
     });
   }, []);
@@ -68,11 +69,11 @@ export default function DashboardPage() {
           </Card>
           <Card className="border-border bg-card">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Revenue</CardTitle>
-              <DollarSign className="h-4 w-4 text-primary" />
+              <CardTitle className="text-sm font-medium text-muted-foreground">Categories</CardTitle>
+              <Tags className="h-4 w-4 text-primary" />
             </CardHeader>
             <CardContent>
-              <p className="text-2xl font-bold text-foreground">$0</p>
+              <p className="text-2xl font-bold text-foreground">{stats.categories}</p>
             </CardContent>
           </Card>
           <Card className="border-border bg-card">
@@ -86,7 +87,7 @@ export default function DashboardPage() {
           </Card>
         </div>
 
-        <div className="mt-8 grid gap-6 sm:grid-cols-2">
+        <div className="mt-8 grid gap-6 sm:grid-cols-3">
           <Card className="border-border bg-card">
             <CardHeader>
               <CardTitle className="text-foreground">Manage Users</CardTitle>
@@ -103,6 +104,15 @@ export default function DashboardPage() {
             <CardContent>
               <p className="text-sm text-muted-foreground mb-4">Add, edit and remove products from the store.</p>
               <Button onClick={() => navigate("/admin/products")}>Go to Products</Button>
+            </CardContent>
+          </Card>
+          <Card className="border-border bg-card">
+            <CardHeader>
+              <CardTitle className="text-foreground">Manage Categories</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground mb-4">Create and manage product categories.</p>
+              <Button onClick={() => navigate("/admin/categories")}>Go to Categories</Button>
             </CardContent>
           </Card>
         </div>

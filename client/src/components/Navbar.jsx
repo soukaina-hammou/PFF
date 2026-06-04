@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ShoppingCart, LogOut, LayoutDashboard, Menu, X, Package } from "lucide-react";
+import { ShoppingCart, LogOut, LayoutDashboard, Menu, X, Settings, Tags } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
 import { Button } from "./ui/button";
@@ -47,6 +47,9 @@ export default function Navbar() {
             </Link>
             <Link to="/products" className="text-sm text-muted-foreground transition-colors hover:text-foreground">
               Products
+            </Link>
+            <Link to="/categories" className="text-sm text-muted-foreground transition-colors hover:text-foreground">
+              Categories
             </Link>
             <Link to="/about" className="text-sm text-muted-foreground transition-colors hover:text-foreground">
               About
@@ -108,6 +111,16 @@ export default function Navbar() {
                       {user?.role}
                     </Badge>
                   </div>
+                  <button
+                    onClick={() => {
+                      setUserMenuOpen(false);
+                      navigate("/categories");
+                    }}
+                    className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-foreground transition-colors hover:bg-muted"
+                  >
+                    <Tags className="h-4 w-4 text-muted-foreground" />
+                    Categories
+                  </button>
                   {isAdmin && (
                     <button
                       onClick={() => {
@@ -120,6 +133,16 @@ export default function Navbar() {
                       Dashboard
                     </button>
                   )}
+                  <button
+                    onClick={() => {
+                      setUserMenuOpen(false);
+                      navigate("/settings");
+                    }}
+                    className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-foreground transition-colors hover:bg-muted"
+                  >
+                    <Settings className="h-4 w-4 text-muted-foreground" />
+                    Settings
+                  </button>
                   <button
                     onClick={handleLogout}
                     className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-foreground transition-colors hover:bg-muted"
@@ -157,6 +180,13 @@ export default function Navbar() {
               className="block rounded-lg px-3 py-2 text-sm text-foreground transition-colors hover:bg-muted"
             >
               Products
+            </Link>
+            <Link
+              to="/categories"
+              onClick={() => setMenuOpen(false)}
+              className="block rounded-lg px-3 py-2 text-sm text-foreground transition-colors hover:bg-muted"
+            >
+              Categories
             </Link>
             <Link
               to="/about"

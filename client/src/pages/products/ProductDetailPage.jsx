@@ -1,11 +1,17 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, ShoppingCart, Package, Minus, Plus, Star } from "lucide-react";
+import { useNavigate, useParams } from "react-router-dom";
+import { ArrowLeft, ShoppingCart, Package, Minus, Plus, ChevronLeft, ChevronRight } from "lucide-react";
 import { getProduct } from "../../api/products";
 import { useCart } from "../../context/CartContext";
 import Layout from "../../components/Layout";
 import { Button } from "../../components/ui/button";
 import { Badge } from "../../components/ui/badge";
+
+const getImages = (product) => {
+  if (product.images && product.images.length > 0) return product.images;
+  if (product.image) return [product.image];
+  return [];
+};
 
 export default function ProductDetailPage() {
   const { id } = useParams();
@@ -15,6 +21,7 @@ export default function ProductDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [quantity, setQuantity] = useState(1);
+  const [currentImage, setCurrentImage] = useState(0);
 
   useEffect(() => {
     setLoading(true);
@@ -33,6 +40,7 @@ export default function ProductDetailPage() {
 
   const cartItem = cartItems.find((item) => item._id === id);
   const inCartCount = cartItem?.quantity || 0;
+  const images = product ? getImages(product) : [];
 
   const handleAddToCart = () => {
     if (!product) return;
@@ -57,7 +65,9 @@ export default function ProductDetailPage() {
       <Layout>
         <div className="mx-auto max-w-7xl px-4 py-20 text-center">
           <Package className="mx-auto h-12 w-12 text-muted-foreground/40 mb-4" />
-          <p className="text-muted-foreground mb-4">{error || "Product not found"}</p>
+          <div className="mx-auto mb-4 max-w-md rounded-lg bg-destructive/10 px-4 py-3 text-sm text-destructive border border-destructive/20">
+            {error || "Product not found"}
+          </div>
           <Button onClick={() => navigate("/products")}>Back to Products</Button>
         </div>
       </Layout>
@@ -77,16 +87,58 @@ export default function ProductDetailPage() {
         </Button>
 
         <div className="grid gap-10 lg:grid-cols-2">
-          <div className="aspect-square overflow-hidden rounded-2xl border border-border bg-muted">
-            {product.image ? (
-              <img
-                src={product.image}
-                alt={product.name}
-                className="h-full w-full object-cover"
-              />
-            ) : (
-              <div className="flex h-full w-full items-center justify-center text-muted-foreground">
-                <Package className="h-20 w-20" />
+          <div className="space-y-4">
+            <div className="relative aspect-square overflow-hidden rounded-2xl border border-border bg-muted">
+              {images.length > 0 ? (
+                <img
+                  src={images[currentImage]}
+                  alt={product.name}
+                  className="h-full w-full object-cover transition-opacity duration-300"
+                />
+              ) : (
+                <div className="flex h-full w-full items-center justify-center text-muted-foreground">
+                  <Package className="h-20 w-20" />
+                </div>
+              )}
+              {images.length > 1 && (
+                <>
+                  <button
+                    onClick={() => setCurrentImage((prev) => (prev === 0 ? images.length - 1 : prev - 1))}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full bg-background/70 text-foreground hover:bg-background transition-colors"
+                  >
+                    <ChevronLeft className="h-5 w-5" />
+                  </button>
+                  <button
+                    onClick={() => setCurrentImage((prev) => (prev === images.length - 1 ? 0 : prev + 1))}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full bg-background/70 text-foreground hover:bg-background transition-colors"
+                  >
+                    <ChevronRight className="h-5 w-5" />
+                  </button>
+                  <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
+                    {images.map((_, i) => (
+                      <button
+                        key={i}
+                        onClick={() => setCurrentImage(i)}
+                        className={`h-2 rounded-full transition-all ${i === currentImage ? "w-6 bg-primary" : "w-2 bg-background/60 hover:bg-background/80"}`}
+                      />
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+            {images.length > 1 && (
+              <div className="flex gap-2 overflow-x-auto pb-1">
+                {images.map((src, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setCurrentImage(i)}
+                    className={`shrink-0 h-16 w-16 rounded-lg border-2 overflow-hidden transition-all ${
+                      i === currentImage ? "border-primary" : "border-border hover:border-primary/50"
+                    }`}
+                  >
+                    <img src={src} alt="" className="h-full w-full object-cover" />
+                  </button>
+                ))}
               </div>
             )}
           </div>

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { ChevronLeft, ChevronRight, Star, ShoppingCart, Package } from "lucide-react";
+import { ChevronLeft, ChevronRight, ShoppingCart, Package } from "lucide-react";
 import { getProducts } from "../../api/products";
 import { useCart } from "../../context/CartContext";
 import Layout from "../../components/Layout";
@@ -8,6 +8,12 @@ import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Card, CardContent } from "../../components/ui/card";
 import { Badge } from "../../components/ui/badge";
+
+const firstImage = (p) => {
+  if (p.images && p.images.length > 0) return p.images[0];
+  if (p.image) return p.image;
+  return null;
+};
 
 export default function ProductsPage() {
   const navigate = useNavigate();
@@ -18,7 +24,8 @@ export default function ProductsPage() {
   const [pages, setPages] = useState(1);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(searchParams.get("category") || "");
+  const [activeCategory, setActiveCategory] = useState(searchParams.get("category") || "");
 
   useEffect(() => {
     setLoading(true);
@@ -33,8 +40,18 @@ export default function ProductsPage() {
   }, [page]);
 
   useEffect(() => {
-    setSearchParams({ page: String(page) });
-  }, [page, setSearchParams]);
+    const category = searchParams.get("category");
+    if (category) {
+      setSearch(category);
+      setActiveCategory(category);
+    }
+  }, [searchParams]);
+
+  useEffect(() => {
+    const params = { page: String(page) };
+    if (activeCategory) params.category = activeCategory;
+    setSearchParams(params);
+  }, [page, activeCategory, setSearchParams]);
 
   const goToPage = (p) => {
     if (p >= 1 && p <= pages) setPage(p);
@@ -66,13 +83,20 @@ export default function ProductsPage() {
           <p className="mt-1 text-muted-foreground">{total} products available</p>
         </div>
 
-        <div className="mb-8">
+        <div className="mb-8 flex flex-wrap items-center gap-3">
           <Input
             placeholder="Search products by name or category..."
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => { setSearch(e.target.value); setActiveCategory(""); }}
             className="max-w-md"
           />
+          {activeCategory && (
+            <Badge variant="secondary" className="gap-1 text-sm px-3 py-1.5">
+              <Package className="h-3.5 w-3.5" />
+              {activeCategory}
+              <button onClick={() => { setSearch(""); setActiveCategory(""); }} className="ml-1 hover:text-foreground">&times;</button>
+            </Badge>
+          )}
         </div>
 
         {loading ? (
@@ -90,9 +114,9 @@ export default function ProductsPage() {
               <Link key={product._id} to={`/products/${product._id}`}>
                 <Card className="group overflow-hidden border-border bg-card transition-all hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5 h-full flex flex-col">
                   <div className="relative aspect-square overflow-hidden bg-muted">
-                    {product.image ? (
+                    {firstImage(product) ? (
                       <img
-                        src={product.image}
+                        src={firstImage(product)}
                         alt={product.name}
                         className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                       />

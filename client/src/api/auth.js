@@ -50,3 +50,14 @@ export const getCurrentUser = (token) => {
     },
   });
 };
+
+export const updateProfile = (payload) => {
+  const token = localStorage.getItem("auth_token");
+  return request("/api/auth/profile", {
+    method: "PUT",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(payload),
+  });
+};

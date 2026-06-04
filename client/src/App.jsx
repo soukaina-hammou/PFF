@@ -6,9 +6,13 @@ import HomePage from "./pages/home/HomePage";
 import AboutPage from "./pages/about/AboutPage";
 import ProductsPage from "./pages/products/ProductsPage";
 import ProductDetailPage from "./pages/products/ProductDetailPage";
+import CategoriesPage from "./pages/categories/CategoriesPage";
+import SettingsPage from "./pages/settings/SettingsPage";
+import CheckoutPage from "./pages/checkout/CheckoutPage";
 import DashboardPage from "./pages/admin/DashboardPage";
 import UsersPage from "./pages/admin/UsersPage";
 import AdminProductsPage from "./pages/admin/ProductsPage";
+import AdminCategoriesPage from "./pages/admin/CategoriesPage";
 
 export default function App() {
   const { user, loading } = useAuth();
@@ -40,6 +44,18 @@ export default function App() {
         element={<ProtectedRoute><ProductDetailPage /></ProtectedRoute>}
       />
       <Route
+        path="/categories"
+        element={<ProtectedRoute><CategoriesPage /></ProtectedRoute>}
+      />
+      <Route
+        path="/settings"
+        element={<ProtectedRoute><SettingsPage /></ProtectedRoute>}
+      />
+      <Route
+        path="/checkout"
+        element={<ProtectedRoute><CheckoutPage /></ProtectedRoute>}
+      />
+      <Route
         path="/about"
         element={<ProtectedRoute><AboutPage /></ProtectedRoute>}
       />
@@ -54,6 +70,10 @@ export default function App() {
       <Route
         path="/admin/products"
         element={<AdminRoute><AdminProductsPage /></AdminRoute>}
+      />
+      <Route
+        path="/admin/categories"
+        element={<AdminRoute><AdminCategoriesPage /></AdminRoute>}
       />
       <Route path="*" element={<Navigate to={user ? "/" : "/auth"} replace />} />
     </Routes>

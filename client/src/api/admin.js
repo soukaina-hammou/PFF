@@ -16,6 +16,28 @@ export const getUsers = async () => {
   return data;
 };
 
+export const createUser = async (payload) => {
+  const res = await fetch(`${API_BASE_URL}/api/admin/users`, {
+    method: "POST",
+    headers: authHeaders(),
+    body: JSON.stringify(payload),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || "Failed to create user");
+  return data;
+};
+
+export const updateUser = async (id, payload) => {
+  const res = await fetch(`${API_BASE_URL}/api/admin/users/${id}`, {
+    method: "PUT",
+    headers: authHeaders(),
+    body: JSON.stringify(payload),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || "Failed to update user");
+  return data;
+};
+
 export const deleteUser = async (id) => {
   const res = await fetch(`${API_BASE_URL}/api/admin/users/${id}`, {
     method: "DELETE",
@@ -64,5 +86,46 @@ export const deleteProduct = async (id) => {
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.message || "Failed to delete product");
+  return data;
+};
+
+export const getCategories = async () => {
+  const res = await fetch(`${API_BASE_URL}/api/admin/categories`, {
+    headers: authHeaders(),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || "Failed to fetch categories");
+  return data;
+};
+
+export const createCategory = async (payload) => {
+  const res = await fetch(`${API_BASE_URL}/api/admin/categories`, {
+    method: "POST",
+    headers: authHeaders(),
+    body: JSON.stringify(payload),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || "Failed to create category");
+  return data;
+};
+
+export const updateCategory = async (id, payload) => {
+  const res = await fetch(`${API_BASE_URL}/api/admin/categories/${id}`, {
+    method: "PUT",
+    headers: authHeaders(),
+    body: JSON.stringify(payload),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || "Failed to update category");
+  return data;
+};
+
+export const deleteCategory = async (id) => {
+  const res = await fetch(`${API_BASE_URL}/api/admin/categories/${id}`, {
+    method: "DELETE",
+    headers: authHeaders(),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || "Failed to delete category");
   return data;
 };
